@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz App</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f4f4;
+        }
+
+        nav {
+            background: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        .grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>Quiz App</nav>
+
+    <div class="container" id="app"></div>
+
+    <script>
+        let app = document.getElementById('app');
+
+        function showSignup() {
+            app.innerHTML = `
+    <h2>Signup</h2>
+    <input id="name" placeholder="Full Name">
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="signup()">Signup</button>
+    <p onclick="showLogin()">Already have account? Login</p>
+  `;
+        }
+
+        function signup() {
+            let user = {
+                name: name.value,
+                email: email.value,
+                pass: pass.value
+            };
+            localStorage.setItem('user', JSON.stringify(user));
+            Swal.fire('Success', 'Account created', 'success');
+            showLogin();
+        }
+
+        function showLogin() {
+            app.innerHTML = `
+    <h2>Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  `;
+        }
+
+        function login() {
+            let saved = JSON.parse(localStorage.getItem('user'));
+            if (email.value === saved.email && pass.value === saved.pass) {
+                Swal.fire('Welcome', 'Login Successful', 'success');
+                showDashboard();
+            } else {
+                Swal.fire('Error', 'Invalid credentials', 'error');
+            }
+        }
+
+        function showDashboard() {
+            app.innerHTML = `
+    <h2>Quiz Dashboard</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>HTML Quiz</h3>
+        <button onclick="startQuiz('html')">Start</button>
+      </div>
+      <div class="card">
+        <h3>CSS Quiz</h3>
+        <button onclick="startQuiz('css')">Start</button>
+      </div>
+      <div class="card">
+        <h3>JS Quiz</h3>
+        <button onclick="startQuiz('js')">Start</button>
+      </div>
+    </div>
+  `;
+        }
+
+        let questions = {
+            html: [
+                { q: 'HTML stands for?', a: ['Hyper', 'HyperText Markup Language', 'Mark'], correct: 1 },
+            ],
+            css: [
+                { q: 'CSS used for?', a: ['Style', 'Logic', 'DB'], correct: 0 },
+            ],
+            js: [
+                { q: 'JS is?', a: ['Language', 'Style', 'None'], correct: 0 },
+            ]
+        };
+
+        let currentQ = 0, score = 0, currentQuiz = [];
+
+        function startQuiz(type) {
+            currentQuiz = questions[type];
+            currentQ = 0; score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            let q = currentQuiz[currentQ];
+            app.innerHTML = `
+    <h3>${q.q}</h3>
+    ${q.a.map((opt, i) => `<button onclick="check(${i})">${opt}</button>`).join('')}
+  `;
+        }
+
+        function check(i) {
+            if (i === currentQuiz[currentQ].correct) score++;
+            currentQ++;
+            if (currentQ < currentQuiz.length) {
+                showQuestion();
+            } else {
+                Swal.fire('Result', `Score: ${score}/${currentQuiz.length}`, 'success');
+                showDashboard();
+            }
+        }
+
+        showSignup();
+    </script>
+
+</body>
+
+</html>
